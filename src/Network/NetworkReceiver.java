@@ -1,3 +1,4 @@
+
 package Network;
 
 import java.io.IOException;
@@ -8,10 +9,11 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class NetworkReceiver extends Thread {
 	private MulticastSocket socket;
-	private ConcurrentLinkedQueue<String> messages;
+	private ConcurrentLinkedQueue<Message> messages;
 	
 	public NetworkReceiver(MulticastSocket s) {
 		socket = s;
+		messages = new ConcurrentLinkedQueue<Message>();
 	}
 	/**
 	 * 
@@ -22,12 +24,13 @@ public class NetworkReceiver extends Thread {
 	}
 	
 	/**
-	 * @return The most recently recieved message if there is one
+	 * @return The most recently received message if there is one
 	 * @throws NoSuchElementException 
 	 */
 	public Message nextMessage() throws NoSuchElementException {
-		return new Message(messages.remove()); 
+		return messages.remove(); 
 	}
+	
 	
 	public void run() {
 		for(;;) {
@@ -39,7 +42,7 @@ public class NetworkReceiver extends Thread {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			messages.add(dp.getData().toString());
+			messages.add(new Message(dp.getData().toString(), dp.getSocketAddress()));
 		}
 	}
 }
