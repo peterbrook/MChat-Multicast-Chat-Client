@@ -5,7 +5,7 @@ import java.net.DatagramPacket;
 import java.net.MulticastSocket;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class NetworkSender extends Thread {
+public class NetworkSender extends Thread implements WriteableQueue<Message> {
 	private MulticastSocket socket;
 	private ConcurrentLinkedQueue<Message> messages;
 
@@ -26,5 +26,10 @@ public class NetworkSender extends Thread {
 				byte[] buf = new byte[1000];
 			}
 		}
+	}
+
+	@Override
+	public void add(Message item) {
+		messages.add(item);
 	}
 }
