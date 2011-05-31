@@ -30,6 +30,7 @@ public class TextReceiver extends Thread implements UIReceiver {
 		for(;;) {
 			System.out.print(">");
 			lm.update();
+			// TODO: if this is changed to use polling (hasNext, etc) then we can cleanly exit
 			String message = input.nextLine();
 			messages.add(message);
 		}
