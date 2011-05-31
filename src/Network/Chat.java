@@ -1,31 +1,46 @@
 package Network;
 
 import java.io.IOException;
-import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
 import java.net.SocketAddress;
-import java.util.logging.Level;
+import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 
-import UserInterface.*;
+import UserInterface.TextUI;
+import UserInterface.UI;
 
 public class Chat {
 	
 	public static void main(String[] args) {
 		String address;
 		int port;
-		if (args.length != 2) {
+		String nickname;
+		if (args.length != 3) {
 			address = "225.0.0.0";
 			port = 6789;
+			nickname = "uname";
 		} else {
 			address = args[0];
 			port = Integer.parseInt(args[1]);
+			nickname = args[2];
+		}
+		
+		try {
+			Logger l = Logger.getLogger("network");
+			l.setUseParentHandlers(false);
+			l.addHandler(new FileHandler("/tmp/network-logger"));
+			
+		} catch (SecurityException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
 		}
 		
 		UI userInterface = new TextUI();
-		//userInterface.hashCode();
 		InetAddress group = null;
 		SocketAddress mcastAddress = null;
 		MulticastSocket socket = null;
@@ -40,17 +55,15 @@ public class Chat {
 			System.exit(0);
 		}
 		
-		String username = "uname";
-		
 		NetworkSender multicastSender = new NetworkSender(socket);
 		multicastSender.start();
 		
 		NetworkReceiver receiver = new NetworkReceiver(socket);
 		receiver.start();
-		AnnounceSender gdaySender = new AnnounceSender(mcastAddress, username);
+		AnnounceSender gdaySender = new AnnounceSender(mcastAddress, nickname);
 		gdaySender.start();
-		ConversationManager cm = new ConversationManager();
-		
+		ConversationManager cm = new ConversationManager(nickname);
+		cm.start();
 		boolean chatting = true;
 		
 		LoopMonitor lm = new LoopMonitor(5, "Main");
@@ -93,7 +106,7 @@ public class Chat {
 		
 		try {
 			gdaySender.stopSending();
-			multicastSender.add(new Message("GBYE "+username, mcastAddress));
+			multicastSender.add(new Message("GBYE "+nickname, mcastAddress));
 			socket.leaveGroup(group);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
