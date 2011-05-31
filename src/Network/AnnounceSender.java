@@ -1,5 +1,6 @@
 package Network;
 
+import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -10,6 +11,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  *
  */
 public class AnnounceSender extends Thread implements ReadableQueue<Message> {
+	private static final boolean MULTI_PORT = true;
 	private ConcurrentLinkedQueue<Message> messages;
 	private SocketAddress multicastAddress;
 	private boolean running;
@@ -25,8 +27,18 @@ public class AnnounceSender extends Thread implements ReadableQueue<Message> {
 	@Override
 	public void run() {
 		while (running) {
-			Message m = new Message("GDAY "+username, multicastAddress);
-			messages.add(m);
+			if (MULTI_PORT) {
+				InetSocketAddress mcA = (InetSocketAddress) multicastAddress;
+				int[] ports = {5000, 5001, 5002, 5003, 5004, 5005};
+				for (int i=0; i < ports.length; i++) {
+					InetSocketAddress a = new InetSocketAddress(mcA.getAddress(), ports[i]);
+					Message m = new Message("GDAY "+username, a);
+					messages.add(m);
+				}
+			} else {
+				Message m = new Message("GDAY "+username, multicastAddress);
+				messages.add(m);
+			}
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
