@@ -3,9 +3,14 @@ package Network;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
+import java.net.SocketAddress;
+import java.net.UnknownHostException;
 import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.logging.Logger;
 
 public class NetworkReceiver extends Thread implements ReadableQueue<Message> {
 	private MulticastSocket socket;
@@ -42,7 +47,28 @@ public class NetworkReceiver extends Thread implements ReadableQueue<Message> {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			messages.add(new Message(new String(dp.getData()), dp.getSocketAddress()));
+			
+			
+			boolean localMsg = false;
+			SocketAddress sa = dp.getSocketAddress();
+			if (sa instanceof InetSocketAddress) {
+				InetSocketAddress inetSA = (InetSocketAddress) sa;
+				try {
+					if (inetSA.getAddress().getHostAddress().equals(InetAddress.getLocalHost().getHostAddress())
+							&& inetSA.getPort() == socket.getLocalPort())
+						localMsg = true;
+				} catch (UnknownHostException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			if (!localMsg) {
+				String d = new String(dp.getData(), 0, dp.getLength());
+				Logger.getLogger("network").setUseParentHandlers(false);
+				Logger.getLogger("network").info("NetworkReceiver: rec'd packet:" + d + " " + dp.getSocketAddress());
+				messages.add(new Message(d, dp.getSocketAddress()));
+			}
+			// No sleep needed since socket.receive blocks
 		}
 	}
 }
