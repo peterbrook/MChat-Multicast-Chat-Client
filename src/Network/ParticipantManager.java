@@ -51,6 +51,7 @@ public class ParticipantManager extends Thread implements ReadableQueue<Message>
 	
 	@Override
 	public void run() {
+		int loopCount = 0;
 		while (running) {
 			
 			// Remove messages which have been sent and ack'd
@@ -76,7 +77,8 @@ public class ParticipantManager extends Thread implements ReadableQueue<Message>
 			}
 			
 			// Send first outstanding message
-			if (!messagesToSend.isEmpty()) {
+			// If enough time has elapsed
+			if (!messagesToSend.isEmpty() && loopCount % 10 == 0) {
 				Entry<Integer, String> e = messagesToSend.firstEntry();
 				StringBuilder sb = new StringBuilder();
 				sb.append("SAYS ");
@@ -87,8 +89,10 @@ public class ParticipantManager extends Thread implements ReadableQueue<Message>
 				sb.append(e.getValue());
 				Message output = new Message(sb.toString(), this.participantAddress);
 				outputMessages.add(output);
+				loopCount = 0;
+			} else {
+				loopCount++;
 			}
-			
 			// Sleep a bit so that we don't max the cpu
 			// note also that this controls the rate at which things are ack'd and sent 
 			try { Thread.sleep(50); } catch (InterruptedException e) { }

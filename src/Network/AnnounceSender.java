@@ -40,7 +40,7 @@ public class AnnounceSender extends Thread implements ReadableQueue<Message> {
 				messages.add(m);
 			}
 			try {
-				Thread.sleep(1000);
+				Thread.sleep(5000);
 			} catch (InterruptedException e) {
 				System.err.println("Announce thread interrupted, resuming");
 			}

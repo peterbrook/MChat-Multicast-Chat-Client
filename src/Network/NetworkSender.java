@@ -43,6 +43,9 @@ public class NetworkSender extends Thread implements WriteableQueue<Message> {
 		if(chatting) messages.add(item);
 	}
 	
+	/**
+	 * Prepare this object for shutdown.
+	 */
 	public void stopChatting() {
 		chatting = false;
 	}

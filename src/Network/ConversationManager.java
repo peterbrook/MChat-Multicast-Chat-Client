@@ -128,6 +128,7 @@ public class ConversationManager extends Thread {
 				//outputQueue.add(m);
 			}
 		} else if (m.getMessageType().equals("GBYE")) {
+			// TODO  CLEAN UP MESSAGE CLASS
 			stopClientManager(m);
 		} else if (m.getMessageType().equals("YEAH")) {
 			clients.get(m.getSocketAddress()).addAckdMessage(m);
