@@ -54,14 +54,14 @@ public class ParticipantManager extends Thread implements ReadableQueue<Message>
 		while (running) {
 			
 			// Remove messages which have been sent and ack'd
-			if (!ackdMessages.isEmpty()) {
+			while (!ackdMessages.isEmpty()) {
 				Message m = ackdMessages.remove();
 				// Remove the given outstanding message from our send list
 				messagesToSend.remove(m.getSequenceNumber());
 			}
 			
 			// Ack received messages
-			if (!messagesToAck.isEmpty()) {
+			while (!messagesToAck.isEmpty()) {
 				Message m = messagesToAck.remove();
 				if (!seenMessages.contains(m.getSequenceNumber())) {
 					seenMessages.add(m.getSequenceNumber());
@@ -91,7 +91,7 @@ public class ParticipantManager extends Thread implements ReadableQueue<Message>
 			
 			// Sleep a bit so that we don't max the cpu
 			// note also that this controls the rate at which things are ack'd and sent 
-			try { Thread.sleep(100); } catch (InterruptedException e) { }
+			try { Thread.sleep(50); } catch (InterruptedException e) { }
 		}
 	}
 	

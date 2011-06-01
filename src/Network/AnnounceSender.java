@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  *
  */
 public class AnnounceSender extends Thread implements ReadableQueue<Message> {
-	private static final boolean MULTI_PORT = true;
+	private static final boolean MULTI_PORT = false;
 	private ConcurrentLinkedQueue<Message> messages;
 	private SocketAddress multicastAddress;
 	private boolean running;

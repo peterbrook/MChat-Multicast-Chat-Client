@@ -18,25 +18,24 @@ public class ConversationManager extends Thread {
 	private int seqNum;
 	private String nickname;
 
-
 	public ConversationManager(String nickname) {
 		this.nickname = nickname; 
 		clients = new ConcurrentHashMap<SocketAddress, ParticipantManager>();
 		outputQueue = new ConcurrentLinkedQueue<Message>();
 		messageQueue = new ConcurrentLinkedQueue<Message>();
-
+		
 		quitSeen = false;
 	}
 
 	@Override
 	public void run() {
-		while (true) {
+		while (!quitSeen) {
 			for (ParticipantManager m : clients.values()) {
-				if (m.hasNext()) {
+				while (m.hasNext()) {
 					messageQueue.add(m.next());
 				}
 				
-				if (m.hasNextForDisplay()) {
+				while (m.hasNextForDisplay()) {
 					outputQueue.add(m.nextForDisplay());
 				}
 			}
@@ -110,7 +109,7 @@ public class ConversationManager extends Thread {
 	private void parseMessage(Message m) {
 		// GDAY? check to see if the socketaddress is in the hashmap. if it is,
 		// get it, stop it, and add a new one
-		if (m.getMessageType().equals("GDAY")) {
+		if (m.getMessageType().equals("GDAY") || m.getMessageType().equals("SAYS")) {
 			boolean clientManagerNotPresent = stopClientManager(m);
 			if (clientManagerNotPresent) {
 				SocketAddress clientAddr = m.getSocketAddress();
@@ -123,11 +122,13 @@ public class ConversationManager extends Thread {
 				// silently ignore this GDAY. Perhaps we should tell the participantmanager that its client
 				// is still alive?
 			}
+			
+			if (m.getMessageType().equals("SAYS")) {
+				clients.get(m.getSocketAddress()).addMessageToAck(m);
+				//outputQueue.add(m);
+			}
 		} else if (m.getMessageType().equals("GBYE")) {
 			stopClientManager(m);
-		} else if (m.getMessageType().equals("SAYS")) {
-			clients.get(m.getSocketAddress()).addMessageToAck(m);
-			//outputQueue.add(m);
 		} else if (m.getMessageType().equals("YEAH")) {
 			clients.get(m.getSocketAddress()).addAckdMessage(m);
 		} else {

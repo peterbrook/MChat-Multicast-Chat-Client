@@ -40,5 +40,9 @@ public class TextUI implements UI {
 	public String nextMessage() throws NoSuchElementException {
 		return reciever.nextMessage();
 	}
-
+	
+	public void stopChatting() {
+		reciever.stopChatting();
+	}
+	
 }

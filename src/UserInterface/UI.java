@@ -21,4 +21,9 @@ public interface UI {
 	 * @throws NoSuchElementException
 	 */
 	public String nextMessage() throws NoSuchElementException;
+	
+	/**
+	 * Kills underlying threads, softly
+	 */
+	public void stopChatting();
 }

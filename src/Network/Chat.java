@@ -13,6 +13,7 @@ import UserInterface.UI;
 
 public class Chat {
 	
+	@SuppressWarnings("deprecation")
 	public static void main(String[] args) {
 		String address;
 		int port;
@@ -103,15 +104,14 @@ public class Chat {
 			// Sleep a bit so that we don't max the cpu
 			try { Thread.sleep(10); } catch (InterruptedException e) { }
 		}
-		
-		try {
-			gdaySender.stopSending();
-			multicastSender.add(new Message("GBYE "+nickname, mcastAddress));
-			socket.leaveGroup(group);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		userInterface.stopChatting();
+		receiver.stopChatting();
+		multicastSender.stopChatting();
+		gdaySender.stopSending();
+		multicastSender.add(new Message("GBYE "+nickname, mcastAddress));
+
+		//socket.leaveGroup(group);
+		//multicastSender.stop();
 		
 	}
 }

@@ -15,10 +15,12 @@ import java.util.logging.Logger;
 public class NetworkReceiver extends Thread implements ReadableQueue<Message> {
 	private MulticastSocket socket;
 	private ConcurrentLinkedQueue<Message> messages;
+	private boolean chatting;
 	
 	public NetworkReceiver(MulticastSocket s) {
 		socket = s;
 		messages = new ConcurrentLinkedQueue<Message>();
+		chatting = true;
 	}
 	/**
 	 * 
@@ -38,7 +40,7 @@ public class NetworkReceiver extends Thread implements ReadableQueue<Message> {
 	
 	
 	public void run() {
-		for(;;) {
+		while(chatting) {
 			byte[] buf = new byte[65507];
 			DatagramPacket dp = new DatagramPacket(buf, buf.length);
 			try {
@@ -69,5 +71,9 @@ public class NetworkReceiver extends Thread implements ReadableQueue<Message> {
 			}
 			// No sleep needed since socket.receive blocks
 		}
+	}
+	
+	public void stopChatting() {
+		chatting = false;
 	}
 }
