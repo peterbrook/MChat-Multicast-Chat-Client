@@ -39,7 +39,6 @@ public class NetworkReceiver extends Thread {
 			try {
 				socket.receive(dp);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			messages.add(new Message(dp.getData().toString(), dp.getSocketAddress()));
