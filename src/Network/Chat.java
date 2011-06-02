@@ -19,8 +19,8 @@ public class Chat {
 		int port;
 		String nickname;
 		if (args.length != 3) {
-			address = "225.0.0.0";
-			port = 6789;
+			address = "230.0.0.1";
+			port = 4446;
 			nickname = "uname";
 		} else {
 			address = args[0];
